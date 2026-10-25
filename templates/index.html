@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">AI</div>
+            <h1>AI Resume Analyzer</h1>
+            <p>Discover how well your resume matches your dream job.</p>
+        </header>
+
+        <main class="card">
+            <h2>Analyze Your Resume</h2>
+            <p class="subtitle">Upload your resume and paste the job description.</p>
+
+            <form method="POST" enctype="multipart/form-data">
+                <label for="resume">Upload Resume (PDF or DOCX)</label>
+                <input
+                    type="file"
+                    id="resume"
+                    name="resume"
+                    accept=".pdf,.docx"
+                    required
+                >
+
+                <label for="job_description">Job Description</label>
+                <textarea
+                    id="job_description"
+                    name="job_description"
+                    rows="7"
+                    placeholder="Paste the job requirements here..."
+                    required
+                >{{ job_description }}</textarea>
+
+                <button type="submit">Analyze My Resume</button>
+            </form>
+
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
+
+            {% if results %}
+                <section class="results">
+                    <h2>Analysis Results</h2>
+
+                    <div class="score-grid">
+                        <div class="score-box">
+                            <span>Text Similarity</span>
+                            <strong>{{ results.similarity_score }}%</strong>
+                        </div>
+                        <div class="score-box">
+                            <span>Skill Match</span>
+                            <strong>{{ results.skill_match }}%</strong>
+                        </div>
+                    </div>
+
+                    <p class="disclaimer">
+                        These scores measure text similarity and listed-skill
+                        overlap. They do not predict hiring outcomes.
+                    </p>
+
+                    <h3>Matched Skills</h3>
+                    {% if results.matched_skills %}
+                        <div class="skill-list">
+                            {% for skill in results.matched_skills %}
+                                <span class="skill matched">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No matching skills from the built-in skill list were found.</p>
+                    {% endif %}
+
+                    <h3>Skills to Consider Developing</h3>
+                    {% if results.missing_skills %}
+                        <div class="skill-list">
+                            {% for skill in results.missing_skills %}
+                                <span class="skill missing">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No missing skills were identified from the built-in list.</p>
+                    {% endif %}
+
+                    <h3>Recommendations</h3>
+                    <ul class="recommendations">
+                        {% for item in results.recommendations %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+        </main>
+
+        <footer>Built with Python, Flask and Natural Language Processing</footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
